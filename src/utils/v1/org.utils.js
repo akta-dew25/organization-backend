@@ -19,6 +19,8 @@ export const createOrgUtils = async (data) => {
       org,
     };
   } catch (error) {
+    console.log("error", error);
+
     return {
       statusCode: 500,
       message: "Internal Server Error",
