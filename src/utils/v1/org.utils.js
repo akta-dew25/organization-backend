@@ -1,4 +1,5 @@
 import Organization from "../../models/org.model.js";
+import { getFileUrl } from "./file.utils.js";
 
 export const createOrgUtils = async (data) => {
   try {
@@ -12,13 +13,19 @@ export const createOrgUtils = async (data) => {
       };
     }
     const org = await Organization.create({ name, domain, logo });
+    const orgData = {
+      ...org.toObject(),
 
+      logo: getFileUrl(org.logo),
+    };
     return {
       statusCode: 201,
       message: "Organization created successfully",
-      org,
+      org: orgData,
     };
   } catch (error) {
+    console.log("error", error);
+
     return {
       statusCode: 500,
       message: "Internal Server Error",
@@ -30,10 +37,15 @@ export const createOrgUtils = async (data) => {
 export const getOrganization = async () => {
   try {
     const org = await Organization.find().sort({ createdAt: -1 });
+    const formattedOrg = org.map((item) => ({
+      ...item.toObject(),
+
+      logo: getFileUrl(item.logo),
+    }));
     return {
       statusCode: 200,
       message: "Organization fetch successfully",
-      org,
+      org: formattedOrg,
     };
   } catch (error) {
     return {
@@ -47,6 +59,11 @@ export const getOrganization = async () => {
 export const getOrganizationById = async (data) => {
   try {
     const org = await Organization.findById(data.params.id);
+    const formattedOrg = {
+      ...org.toObject(),
+
+      logo: getFileUrl(org.logo),
+    };
 
     if (!org) {
       return {
@@ -57,7 +74,7 @@ export const getOrganizationById = async (data) => {
     return {
       statusCode: 200,
       message: "org fetch successfully",
-      org,
+      org: formattedOrg,
     };
   } catch (error) {
     return {
@@ -77,6 +94,11 @@ export const updateOrganization = async (data) => {
       { name, logo },
       { new: true },
     );
+    const formattedOrg = {
+      ...org.toObject(),
+
+      logo: getFileUrl(org.logo),
+    };
     if (!org) {
       return {
         statusCode: 404,
@@ -86,7 +108,7 @@ export const updateOrganization = async (data) => {
     return {
       statusCode: 200,
       message: "org updated successfully",
-      org,
+      org: formattedOrg,
     };
   } catch (error) {
     return {
